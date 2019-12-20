@@ -6,7 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     artist_id: DataTypes.INTEGER
   }, {});
   album.associate = function(models) {
-    // associations can be defined here
+    album.hasMany(models.song, {
+      as: 'songs',
+      foreignKey: 'album_id'
+    })
   };
   return album;
 };
