@@ -9,7 +9,7 @@ readline.question(`what's artist name?`, (name) => {
 
   models.artist.create({name: name})
     .then(function (artist) {
-      console.log(artist);
+      console.log("New artist id: " + artist.dataValues.id);
     });
   readline.close();
 });
