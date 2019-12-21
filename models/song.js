@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
     year: DataTypes.INTEGER
   }, {});
   song.associate = function(models) {
-    // associations can be defined here
+    song.belongsTo(models.album, {
+      as: 'album',
+      foreignKey: 'album_id'
+    });
   };
   return song;
 };
