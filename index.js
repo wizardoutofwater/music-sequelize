@@ -9,8 +9,12 @@ app.get("/artist", function (req, response) {
   // add code to get all artists
 });
 
-app.put("/artist/:id", function (req, response) {
+app.get("/artist/:id", function (req, response) {
   // add code to get specific artist
+});
+
+app.put("/artist/:id", function (req, response) {
+  // add code to modify an specific artist
 });
 
 app.post("/artist", function (req, response) {
@@ -19,8 +23,6 @@ app.post("/artist", function (req, response) {
 });
 
 // Add code to get all albums. GET /album
-
-// Add code to get a specific albums. GET /album/:id
 
 // Add code to get a specific albums. GET /album/:id
 
