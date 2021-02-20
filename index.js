@@ -1,10 +1,9 @@
 const express = require("express");
 const app = express();
-const models = require('./models');
-const bodyParser = require("body-parser");
+const db = require('./models');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 app.get("/artist", function (req, response) {
   // add code to get all artists
