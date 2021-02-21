@@ -1,25 +1,61 @@
 const express = require("express");
 const app = express();
-const db = require('./models');
+const db = require("./models");
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/artist", function (req, response) {
-  // add code to get all artists
+
+// GET All Artists
+app.get("/artist", (req, res) => {
+  db.artist.findAll().then((results) => {
+    res.json(results); // this threw a rejection error when placed at the end.. why?
+    results.forEach(function (index) {
+      console.log(index.id, index.name);
+    });
+  });
 });
 
-app.get("/artist/:id", function (req, response) {
-  // add code to get specific artist
+// GET Specific Artist (artist/:id)
+app.get("/artist/:id", (req, res) => {
+  db.artist
+    .findAll({ where: { id: parseInt(req.params.id) } })
+    .then((artist) => {
+      res.json(artist);
+      artist.forEach(function (artist) {
+        console.log(artist.id, artist.name);
+      });
+    });
 });
 
-app.put("/artist/:id", function (req, response) {
+
+// Add New Artist POST (/artist)
+app.post('/artist', (req, res) => {
+   if(!req.body.name){
+    console.log(req.body);
+    res.send('please provide Artist Name');
+    return;
+  }
+  db.artist.create({
+    name: req.body.name
+  }).then((artist) => {
+      console.log(`Artist Created with ID # ${artist.id}`); // Need to make this line more like line 12
+      res.send(artist);
+  });
+})
+
+app.put("/artist/:id", (req, res) => {
   // add code to modify an specific artist
-});
+  db.artist.update({
+    name: req.body.name
+  },
+  { where: { id: parseInt(req.params.id) } 
+}).then((updatedArtist) => {
 
-app.post("/artist", function (req, response) {
-  console.log('creating artist');
-  // add code to create artist
+    console.log (updatedArtist);
+    res.send(updatedArtist);
+});
+  
 });
 
 // Add code to get all albums. GET /album
@@ -32,6 +68,6 @@ app.post("/artist", function (req, response) {
 
 // Add code to create a song for an album. POST /album/song
 
-app.listen(3000, function(){
-  console.log('server listening on port 3000');
-})
+app.listen(3000, function () {
+  console.log("server listening on port 3000");
+});
