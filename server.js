@@ -11,7 +11,7 @@ app.use(morgan('tiny'));
 // GET All Artists
 app.get("/artist", (req, res) => {
   db.artist.findAll().then((results) => {
-    res.json(results); // this threw a rejection error when placed at the end.. why?
+    res.send(results); // this threw a rejection error when placed at the end.. why?
     results.forEach(function (index) {
       console.log(index.id, index.name);
     });
@@ -23,7 +23,7 @@ app.get("/artist/:id", (req, res) => {
   db.artist
     .findAll({ where: { id: parseInt(req.params.id) } })
     .then((artist) => {
-      res.json(artist);
+      res.send(artist);
       artist.forEach(function (artist) {
         console.log(artist.id, artist.name);
       });
