@@ -80,6 +80,24 @@ app.get("/album", (req, res) => {
 // Add code to get a specific albums. GET /album/:id
 
 // Add code to create an album. POST /album
+app.post("/album", (req, res) => {
+  if (!req.body.name) {
+    console.log(req.body);
+    res.send("please provide Album Name");
+    return;
+  }
+  db.album
+    .create({
+      name: req.body.name,
+      year: req.body.year,
+      artist_id: req.body.artist_id
+    })
+    .then((album) => {
+      console.log(`Album Created with ID # ${album.id}`); // Need to make this line more like line 12
+      res.send(album);
+    });
+});
+
 
 // Add Code to get all songs from an album. GET /album/song SELECT * FROM songs WHERE album_id = ($1)
 
