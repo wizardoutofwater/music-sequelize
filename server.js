@@ -1,9 +1,12 @@
 const express = require("express");
+const morgan = require('morgan')
 const app = express();
 const db = require("./models");
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // why use true or false here?  
+app.use(morgan('tiny'));
+
 
 // GET All Artists
 app.get("/artist", (req, res) => {
@@ -67,7 +70,7 @@ app.put("/artist/:id", (req, res) => {
 //     });
 // });
 
-// Add code to get all albums. GET /album
+// GET all albums. GET /album
 app.get("/album", (req, res) => {
   db.album.findAll().then((results) => {
     res.send(results); // this threw a rejection error when placed at the end.. why?
@@ -77,9 +80,19 @@ app.get("/album", (req, res) => {
   });
 });
 
-// Add code to get a specific albums. GET /album/:id
+// GET Specific ALbum /album/:id
+app.get("/album/:id", (req, res) => {
+  db.album
+    .findByPk(req.params.id)
+    .then((album) => {
+      res.send(album);
+      // (function (album) {
+      //   console.log(album.id, album.name);
+      // });
+    });
+});
 
-// Add code to create an album. POST /album
+// Create album POST /album
 app.post("/album", (req, res) => {
   if (!req.body.name) {
     console.log(req.body);
@@ -99,9 +112,18 @@ app.post("/album", (req, res) => {
 });
 
 
-// Add Code to get all songs from an album. GET /album/song SELECT * FROM songs WHERE album_id = ($1)
-
-// Add code to create a song for an album. POST /album/song
+//  get all songs from an album. GET /album/song SELECT * FROM songs WHERE album_id = ($1)
+app.get("/album/:id/songs", (req, res) => {
+  db.song
+    .findAll({ where: { album_id: parseInt(req.params.id) } })
+    .then((songs) => {
+      res.json(songs);
+      songs.forEach(function (song) {
+        console.log(song.id, song.name);
+      });
+    });
+});
+//  create a song for an album. POST /album/song
 app.post("/album/:id", (req, res) => {
   if (!req.body.name) {
     console.log(req.body);
