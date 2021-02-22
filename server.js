@@ -1,12 +1,14 @@
 const express = require("express");
-const morgan = require('morgan')
+const morgan = require("morgan");
 const app = express();
 const db = require("./models");
+const chalk = require('chalk');
+
+const error = chalk.bold.red;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // why use true or false here?  
-app.use(morgan('tiny'));
-
+app.use(express.urlencoded({ extended: true })); // why use true or false here?
+app.use(morgan("tiny"));
 
 // GET All Artists
 app.get("/artist", (req, res) => {
@@ -49,7 +51,7 @@ app.post("/artist", (req, res) => {
 
 // Update Artist Info
 app.put("/artist/:id", (req, res) => {
-  db.artist.findByPk(req.params.id).then(function(artist) {
+  db.artist.findByPk(req.params.id).then(function (artist) {
     artist
       .update({
         name: req.body.name,
@@ -82,14 +84,12 @@ app.get("/album", (req, res) => {
 
 // GET Specific ALbum /album/:id
 app.get("/album/:id", (req, res) => {
-  db.album
-    .findByPk(req.params.id)
-    .then((album) => {
-      res.send(album);
-      // (function (album) {
-      //   console.log(album.id, album.name);
-      // });
-    });
+  db.album.findByPk(req.params.id).then((album) => {
+    res.send(album);
+    // (function (album) {
+    //   console.log(album.id, album.name);
+    // });
+  });
 });
 
 // Create album POST /album
@@ -103,14 +103,13 @@ app.post("/album", (req, res) => {
     .create({
       name: req.body.name,
       year: req.body.year,
-      artist_id: req.body.artist_id
+      artist_id: req.body.artist_id,
     })
     .then((album) => {
       console.log(`Album Created with ID # ${album.id}`); // Need to make this line more like line 12
       res.send(album);
     });
 });
-
 
 //  get all songs from an album. GET /album/song SELECT * FROM songs WHERE album_id = ($1)
 app.get("/album/:id/songs", (req, res) => {
@@ -143,5 +142,5 @@ app.post("/album/:id", (req, res) => {
 });
 
 app.listen(3000, function () {
-  console.log("server listening on port 3000");
+  console.log(chalk.cyanBright("server listening on port " + chalk.bold.bgMagenta("3000")));
 });
