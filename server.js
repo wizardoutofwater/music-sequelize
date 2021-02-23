@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const db = require("./models");
-const chalk = require('chalk');
+const chalk = require("chalk");
 
 const error = chalk.bold.red;
 
@@ -15,7 +15,9 @@ app.get("/artist", (req, res) => {
   db.artist.findAll().then((results) => {
     res.send(results); // this threw a rejection error when placed at the end.. why?
     results.forEach(function (index) {
-      console.log(index.id, index.name);
+      console.log(
+        chalk.keyword("orange")(chalk.magenta.bold(index.id), index.name)
+      );
     });
   });
 });
@@ -25,10 +27,16 @@ app.get("/artist/:id", (req, res) => {
   db.artist
     .findAll({ where: { id: parseInt(req.params.id) } })
     .then((artist) => {
-      res.send(artist);
-      artist.forEach(function (artist) {
-        console.log(artist.id, artist.name);
-      });
+      if (artist !== undefined && artist.length != 0) {  // <--- Make this Error Handler more like my forum errors 
+        res.send(artist);
+        artist.forEach(function (artist) {
+          console.log(
+            chalk.keyword("orange")(chalk.magenta.bold(artist.id), artist.name)
+          );
+        });
+      } else {
+        res.status(404).send("No Artist Found with ID: " + req.params.id);
+      }
     });
 });
 
@@ -36,7 +44,7 @@ app.get("/artist/:id", (req, res) => {
 app.post("/artist", (req, res) => {
   if (!req.body.name) {
     console.log(req.body);
-    res.send("please provide Artist Name");
+    res.status(400).send("Please provide Artist Name");
     return;
   }
   db.artist
@@ -57,19 +65,25 @@ app.put("/artist/:id", (req, res) => {
         name: req.body.name,
       })
       .then((artist) => {
+        console.log(
+          chalk.keyword("orange")(chalk.magenta.bold(artist.id), artist.name)
+        );
         res.send(artist);
       });
   });
 });
 
-// -------CODE BELOW DIDNT FULLY WORK, WHY?---------
-//   db.artist
-//     .update({ name: req.body.name }, { where: { id: req.params.id } })
-//     .then(function (artist) {
-//       console.log(`Updated Artist with ID# ${artist.id}`);
-//       console.log(artist);
-//       res.send(artist); // why is this outputting ' [1] ', but still successfully updating the db?
-//     });
+// -------CODE BELOW DIDNT FULLY WORK, WHY?--------- why use a where when you can findByPk?
+// db.artist
+//   .update({ name: req.body.name }, { where: { id: req.params.id } })
+//   .then(function (results) {
+//     console.log(`Updated Artist with ID# ${req.params.id}`);
+//     res.send(results);
+//    results.forEach((updatedArtist) =>{
+//      console.log(updatedArtist) // why is this outputting ' [1] ', but still successfully updating the db?
+
+//    });
+//   });
 // });
 
 // GET all albums. GET /album
@@ -141,6 +155,55 @@ app.post("/album/:id", (req, res) => {
     });
 });
 
+// get all albums with artist attached
+app.get("/albums/artists", (req, res) => {
+  db.album
+    .findAll({
+      include: "artist", //[{model: artist}]  <--why didnt that work? its how its done in L.P
+    })
+    .then((results) => {
+      res.send(results);
+    });
+});
+
+//--------- MORE ROUTES + QUERY IDEAS --------
+
+// Get all Albums by a specific Artist by ID
+
+// Get all Albums by a specific Artist by Name
+
+// Get All songs by Specific Artist, sorted by album
+
+// get all albums released in a specific year GET /albums/YEAR=:year <-- is this how you would do that? how best to implement?
+
+// get all songs released in a specific year (through the album release year)
+
+// Update Album Info PUT (/album/:id)
+
+// Update Song Info PUT (/song/:id)
+
+// -------------**************----------------
+
+// ------------ADD ERROR HANDLER MIDDLEWARE BELOW----------
+
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  console.log(error.stack);
+  res.status(error.status || 500).send({
+    error: {
+      status: error.status || 500,
+      message: error.message || "Internal Server Error",
+    },
+  });
+});
+
 app.listen(3000, function () {
-  console.log(chalk.cyanBright("server listening on port " + chalk.bold.bgMagenta("3000")));
+  console.log(
+    chalk.cyanBright("server listening on port " + chalk.bold.bgMagenta("3000"))
+  );
 });
