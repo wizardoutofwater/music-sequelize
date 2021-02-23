@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   album.associate = function(models) {
     album.belongsTo(models.artist, {
+        as: "artist",
         foreignKey: "artist_id",
         onDelete: 'CASCADE'
     });

@@ -15,7 +15,8 @@ app.get("/artist", (req, res) => {
   db.artist.findAll().then((results) => {
     res.send(results); // this threw a rejection error when placed at the end.. why?
     results.forEach(function (index) {
-      console.log(index.id, index.name);
+      console.log(chalk.keyword('orange')
+        (chalk.magenta.bold(index.id), index.name));
     });
   });
 });
@@ -24,10 +25,10 @@ app.get("/artist", (req, res) => {
 app.get("/artist/:id", (req, res) => {
   db.artist
     .findAll({ where: { id: parseInt(req.params.id) } })
-    .then((artist) => {
+    .then(artist => {
       res.send(artist);
       artist.forEach(function (artist) {
-        console.log(artist.id, artist.name);
+        console.log(chalk.keyword('orange') (chalk.magenta.bold(artist.id), artist.name));
       });
     });
 });
@@ -139,6 +140,52 @@ app.post("/album/:id", (req, res) => {
       console.log(`song Created with ID # ${song.id}`);
       res.send(song);
     });
+});
+
+// get all albums with artist attached
+app.get("/albums/artists",  (req,res) =>{
+  db.album.findAll({
+    include: 'artist',  //[{model: artist}]  <--why didnt that work? its how its done in L.P
+  })
+  .then((results) => {
+  res.send(results);
+  });
+})
+
+
+//--------- MORE ROUTES + QUERY IDEAS --------
+
+// Get all Albums by a specific Artist by ID
+
+// Get all Albums by a specific Artist by Name
+
+// Get All songs by Specific Artist, sorted by album
+
+// get all albums released in a specific year GET /albums/YEAR=:year <-- is this how you would do that? how best to implement?
+
+// get all songs released in a specific year (through the album release year)
+
+// Update Album Info PUT (/album/:id)
+
+// Update Song Info PUT (/song/:id)
+
+// -------------**************----------------
+
+// ------------ADD ERROR HANDLER MIDDLEWARE BELOW----------
+
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  res.status(error.status || 500).send({
+    error: {
+      status: error.status || 500,
+      message: error.message || "Internal Server Error",
+    },
+  });
 });
 
 app.listen(3000, function () {

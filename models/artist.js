@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       artist.hasMany(models.album, {
+          as: 'albums',
           foreignKey: 'artist_id',
           onDelete: 'CASCADE'
       });
